@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel AI - Testing Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        button.secondary {
+            background: #764ba2;
+        }
+
+        button.secondary:hover {
+            background: #6a3d8f;
+        }
+
+        .response-box {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+            margin-top: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .response-box.success {
+            border-left-color: #4caf50;
+            background: #f1f8f5;
+        }
+
+        .response-box.error {
+            border-left-color: #f44336;
+            background: #fff3f0;
+        }
+
+        .token-info {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 0.85em;
+            border: 1px solid #ddd;
+        }
+
+        .token-info p {
+            margin: 5px 0;
+            word-break: break-all;
+        }
+
+        .test-item {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 5px;
+            border-left: 4px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .test-item.passed {
+            border-left-color: #4caf50;
+            background: #f1f8f5;
+        }
+
+        .test-item.failed {
+            border-left-color: #f44336;
+            background: #fff3f0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+
+        .badge.passed {
+            background: #4caf50;
+            color: white;
+        }
+
+        .badge.failed {
+            background: #f44336;
+            color: white;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        hr {
+            margin: 15px 0;
+            border: none;
+            border-top: 1px solid #ddd;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛡️ Sentinel AI</h1>
+            <p>Backend Testing Dashboard - Phase 2: Authentication & Session Management</p>
+        </header>
+
+        <div class="main-grid">
+            <!-- Auth Section -->
+            <div class="card">
+                <h2>🔐 Authentication</h2>
+
+                <div class="form-group">
+                    <label>Username:</label>
+                    <input type="text" id="regUsername" placeholder="testuser" value="testuser">
+                </div>
+
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="regEmail" placeholder="test@example.com" value="test@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label>Password:</label>
+                    <input type="password" id="regPassword" placeholder="password123" value="password123">
+                </div>
+
+                <button onclick="register()">📝 Register User</button>
+                <div id="registerResponse" class="response-box"></div>
+
+                <hr>
+
+                <button onclick="login()">🔑 Login</button>
+                <div id="loginResponse" class="response-box"></div>
+
+                <div id="tokenInfo" class="token-info" style="display: none;">
+                    <p><strong>✅ Logged In!</strong></p>
+                    <p><strong>User ID:</strong> <span id="userId"></span></p>
+                    <p><strong>Username:</strong> <span id="username"></span></p>
+                    <p><strong>Token Expires:</strong> <span id="expiresIn"></span>s</p>
+                </div>
+            </div>
+
+            <!-- User & Session Section -->
+            <div class="card">
+                <h2>👤 User & Session</h2>
+
+                <button onclick="getCurrentUser()">👤 Get Current User</button>
+                <div id="userResponse" class="response-box"></div>
+
+                <hr>
+
+                <button onclick="logout()">🚪 Logout</button>
+                <div id="logoutResponse" class="response-box"></div>
+
+                <hr>
+
+                <h3 style="margin-top: 15px; margin-bottom: 10px;">📋 Session Info</h3>
+                <div class="form-group">
+                    <label>Session ID:</label>
+                    <input type="text" id="sessionIdInput" placeholder="Will auto-populate after login">
+                </div>
+
+                <button onclick="getSessionInfo()">Get Session Details</button>
+                <div id="sessionResponse" class="response-box"></div>
+            </div>
+
+            <!-- Activity Tracking -->
+            <div class="card">
+                <h2>📊 Activity Tracking</h2>
+
+                <div class="form-group">
+                    <label>Session ID:</label>
+                    <input type="text" id="trackSessionId" placeholder="Will auto-populate after login">
+                </div>
+
+                <button onclick="trackActivity()">📍 Log Activity Once</button>
+                <div id="trackResponse" class="response-box"></div>
+
+                <hr>
+
+                <button onclick="trackActivityMultiple(5)">📍 Log Activity 5 times</button>
+                <div id="trackMultipleResponse" class="response-box"></div>
+            </div>
+
+            <!-- Token Management -->
+            <div class="card">
+                <h2>🔄 Token Management</h2>
+
+                <button onclick="refreshAccessToken()">🔄 Refresh Access Token</button>
+                <div id="refreshResponse" class="response-box"></div>
+
+                <hr>
+
+                <h3 style="margin-top: 15px; margin-bottom: 10px;">❤️ Health Check</h3>
+                <button onclick="healthCheck()">Check API Status</button>
+                <div id="healthResponse" class="response-box"></div>
+
+                <hr>
+
+                <h3 style="margin-top: 15px; margin-bottom: 10px;">🧹 Utilities</h3>
+                <button onclick="clearStorage()" class="secondary">Clear Stored Tokens</button>
+                <p style="font-size: 0.85em; color: #999; margin-top: 5px;">Clears access token and session from browser storage</p>
+            </div>
+
+            <!-- Test Results -->
+            <div class="card full-width">
+                <h2>✅ Automated Tests</h2>
+                <button onclick="runAllTests()" style="margin-bottom: 15px;">▶️ Run All Tests</button>
+                <div id="testResults"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
