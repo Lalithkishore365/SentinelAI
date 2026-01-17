@@ -4,6 +4,7 @@ from fastapi import FastAPI, Request, HTTPException, Query, Depends, Header
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import logging
+from db_init import init_db
 
 from session_manager import create_session, session_exists, logout_session, get_session_info
 from activity_logger import log_request
@@ -17,6 +18,12 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Sentinel AI", version="2.0.0")
+# Initialize database & tables at startup
+from db_init import init_db
+
+@app.on_event("startup")
+def startup_event():
+    init_db()
 
 # Add CORS middleware
 app.add_middleware(

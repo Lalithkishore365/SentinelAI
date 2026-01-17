@@ -5,7 +5,7 @@ import time
 DB_CONFIG = {
     "dbname": "sentinel_ai",
     "user": "postgres",
-    "password": "Alpha_Spectram@123",
+    "password": "Lalith@2005",
     "host": "localhost",
     "port": "5432",
 }
