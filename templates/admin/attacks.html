@@ -1,0 +1,19 @@
+{% extends "admin/layout.html" %}
+{% block content %}
+<h2>Attack Logs</h2>
+<table>
+<tr>
+<th>Session</th><th>Risk</th><th>ML</th><th>Rules</th><th>Action</th><th>Time</th>
+</tr>
+{% for r in rows %}
+<tr>
+<td>{{ r.session_id[:8] }}</td>
+<td>{{ r.risk_score }}</td>
+<td>{{ r.ml_score }}</td>
+<td>{{ r.triggered_rules }}</td>
+<td>{{ r.action_taken }}</td>
+<td>{{ r.event_time }}</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

@@ -299,14 +299,21 @@ def detect_attack_realtime():
                     if result["action"] == "BLOCK":
                         print(f"\n🚫🚫🚫 BLOCKING USER: {username} 🚫🚫🚫\n")
                         
-                        # Mark session as blocked
                         cur.execute("""
                             UPDATE user_sessions
                             SET is_blocked = 1
                             WHERE session_id = ?
                         """, (session_id,))
-                        
                         conn.commit()
+
+                        # 2️⃣ Permanently block user (login-level)
+                        permanently_block_user(username, session_id, reason)
+
+                        # 3️⃣ Clear flask session
+                        session.clear()
+
+                        # 4️⃣ 💣 HARD STOP REQUEST (THIS IS THE ACTUAL BLOCK)
+                        abort(403)
                         conn.close()
                         
                         # Permanently block the user
@@ -430,7 +437,7 @@ def submit_form():
 def download_doc():
     if "session_id" not in session:
         return redirect(url_for("login"))
-    return "Dummy document download", 200
+    return render_template("download_doc.html")
 
 
 @app.route("/logout")

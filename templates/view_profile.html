@@ -1,4 +1,34 @@
-<h2>User Profile</h2>
-<p>This is your profile page.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
 
-<a href="/home">Back</a>
+<div class="profile-page">
+    <div class="profile-card">
+        <h2>👤 User Profile</h2>
+
+        <div class="profile-row">
+            <span>Username</span>
+            <strong>{{ session['user_id'] }}</strong>
+        </div>
+
+        <div class="profile-row">
+            <span>Session ID</span>
+            <strong>{{ session['session_id'][:8] }}...</strong>
+        </div>
+
+        <div class="profile-row">
+            <span>Status</span>
+            <strong class="status-ok">Active</strong>
+        </div>
+
+        <a href="{{ url_for('home') }}" class="btn-back">⬅ Back to Home</a>
+    </div>
+</div>
+
+</body>
+</html>

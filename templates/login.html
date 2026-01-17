@@ -2,22 +2,27 @@
 <html>
 <head>
     <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h2>Campus Portal Login</h2>
+
+<div class="container">
+    <h1>Secure Portal</h1>
 
     {% if error %}
-        <p style="color:red;">{{ error }}</p>
+        <div class="error">{{ error }}</div>
     {% endif %}
 
     <form method="POST">
-        <label>Username:</label><br>
-        <input type="text" name="username" required><br><br>
+        <label>Username</label>
+        <input type="text" name="username" required>
 
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
+        <label>Password</label>
+        <input type="password" name="password" required>
 
         <button type="submit">Login</button>
     </form>
+</div>
+
 </body>
 </html>

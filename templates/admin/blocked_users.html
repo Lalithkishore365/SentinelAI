@@ -1,0 +1,14 @@
+{% extends "admin/layout.html" %}
+{% block content %}
+<h2>Blocked Users</h2>
+<table>
+<tr><th>Username</th><th>Reason</th><th>Time</th></tr>
+{% for r in rows %}
+<tr>
+<td>{{ r.username }}</td>
+<td>{{ r.block_reason }}</td>
+<td>{{ r.block_time }}</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

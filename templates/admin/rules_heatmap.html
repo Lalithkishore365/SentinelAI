@@ -1,0 +1,25 @@
+{% extends "admin/layout.html" %}
+{% block content %}
+<h2>🔥 Rule-wise Attack Heatmap</h2>
+
+<canvas id="ruleHeatmap"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+new Chart(document.getElementById("ruleHeatmap"), {
+    type: "bar",
+    data: {
+        labels: {{ rules | safe }},
+        datasets: [{
+            label: "Triggers",
+            data: {{ counts | safe }},
+            backgroundColor: "#dc2626"
+        }]
+    },
+    options: {
+        indexAxis: 'y'
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "admin/layout.html" %}
+{% block content %}
+<h1>Admin Dashboard</h1>
+
+<div class="cards">
+    <div class="card">Total Sessions<br><strong>{{ stats.total_sessions }}</strong></div>
+    <div class="card">Attacks Detected<br><strong>{{ stats.total_attacks }}</strong></div>
+    <div class="card">Blocked Users<br><strong>{{ stats.blocked_users }}</strong></div>
+    <div class="card">Active Sessions<br><strong>{{ stats.active_sessions }}</strong></div>
+</div>
+
+<hr>
+
+<h2>📊 Attack Analytics</h2>
+
+<div class="chart-grid">
+    <canvas id="attackTrend"></canvas>
+    <canvas id="actionChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+/* 🔹 Attack Trend */
+const attackTrendCtx = document.getElementById('attackTrend').getContext('2d');
+new Chart(attackTrendCtx, {
+    type: 'line',
+    data: {
+        labels: {{ attack_trend | map(attribute='day') | list | safe }},
+        datasets: [{
+            label: 'Attacks per Day',
+            data: {{ attack_trend | map(attribute='count') | list | safe }},
+            borderColor: '#dc2626',
+            fill: false,
+            tension: 0.3
+        }]
+    }
+});
+
+/* 🔹 Action Distribution */
+const actionCtx = document.getElementById('actionChart').getContext('2d');
+new Chart(actionCtx, {
+    type: 'pie',
+    data: {
+        labels: {{ action_dist | map(attribute='action_taken') | list | safe }},
+        datasets: [{
+            data: {{ action_dist | map(attribute='count') | list | safe }},
+            backgroundColor: ['#22c55e', '#ef4444', '#f59e0b']
+        }]
+    }
+});
+</script>
+<a href="/admin/export/security-events" class="btn">
+⬇ Download Security Events CSV
+</a>
+
+{% endblock %}

@@ -1,41 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Home</title>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
-<h2>Welcome</h2>
+<div class="container">
+    <div class="nav">
+        <strong>Welcome</strong>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
 
-<!-- VIEW PROFILE (GET is fine) -->
-<a href="/view-profile">
-    <button>View Profile</button>
-</a>
+    <h2>User Dashboard</h2>
 
-<br><br>
+    <p>This is a demo web application simulating normal user activity.</p>
+    <br>
 
-<!-- UPDATE PROFILE (POST ONLY) -->
-<form action="/update-profile" method="post">
-    <button type="submit">Update Profile</button>
-</form>
+    <form action="/view-profile">
+        <button type="submit">View Profile</button>
+    </form>
+    <br>
 
-<br>
+    <form action="/update-profile" method="POST">
+        <button type="submit">Update Profile</button>
+    </form>
+    <br>
 
-<!-- SUBMIT FORM (POST ONLY) -->
-<form action="/submit-form" method="post">
-    <button type="submit">Submit Form</button>
-</form>
+    <form action="/submit-form" method="POST">
+        <button type="submit">Submit Form</button>
+    </form>
+    <br>
 
-<br>
-
-<!-- DOWNLOAD DOC (GET is fine) -->
-<a href="/download-doc">
-    <button>Download Document</button>
-</a>
-
-<br><br>
-
-<a href="/logout">Logout</a>
+    <form action="/download-doc">
+        <button type="submit">Download Document</button>
+    </form>
+</div>
 
 </body>
 </html>

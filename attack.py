@@ -9,7 +9,7 @@ import time
 import sys
 
 BASE_URL = "http://127.0.0.1:5000"
-USERNAME = "admin"
+USERNAME = "admin4"
 PASSWORD = "admin123"
 
 def run_attack():

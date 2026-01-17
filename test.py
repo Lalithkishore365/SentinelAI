@@ -9,8 +9,17 @@ conn = sqlite3.connect(DB_PATH)
 cur = conn.cursor()
 
 cur.execute("""
-    INSERT INTO users (username, password)
-    VALUES ('admin1', 'admin123')
+    CREATE TABLE IF NOT EXISTS admin_users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE,
+    password TEXT
+);
+
+""")
+
+cur.execute("""
+    INSERT INTO admin_users (username, password)
+    VALUES ('admin', 'admin123');
 """)
 
 conn.commit()

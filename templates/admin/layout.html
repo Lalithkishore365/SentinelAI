@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sentinel AI Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+<div class="sidebar">
+    <h2>🛡 Sentinel AI</h2>
+    <a href="/admin/dashboard">Dashboard</a>
+    <a href="/admin/attacks">Attack Logs</a>
+    <a href="/admin/blocked-users">Blocked Users</a>
+    <a href="/admin/rules-heatmap">Rule Heatmap</a>
+    <a href="/admin/session-replay">Session Replay</a>
+    <a href="/admin/logout">Logout</a>
+</div>
+<div class="content">
+    {% block content %}{% endblock %}
+</div>
+</body>
+</html>

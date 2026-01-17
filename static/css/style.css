@@ -1,0 +1,177 @@
+/* ===== Global Reset ===== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+body {
+    background: #f4f7fb;
+    color: #333;
+    min-height: 100vh;
+}
+
+/* ===== Centered Container ===== */
+.container {
+    max-width: 420px;
+    margin: 80px auto;
+    background: #ffffff;
+    padding: 32px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* ===== Headings ===== */
+h1, h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+/* ===== Forms ===== */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+input {
+    padding: 12px;
+    margin-bottom: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+input:focus {
+    outline: none;
+    border-color: #4a90e2;
+}
+
+/* ===== Buttons ===== */
+button {
+    padding: 12px;
+    border-radius: 6px;
+    border: none;
+    background: #4a90e2;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #357abd;
+}
+
+/* ===== Links ===== */
+a {
+    text-decoration: none;
+    color: #4a90e2;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ===== Navigation ===== */
+.nav {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+/* ===== Alerts ===== */
+.error {
+    background: #ffe6e6;
+    color: #c0392b;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.success {
+    background: #e6fffa;
+    color: #065f46;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* ===== Blocked Page ===== */
+.blocked {
+    text-align: center;
+}
+
+.blocked h1 {
+    color: #c0392b;
+}
+
+/* =========================
+   VIEW PROFILE PAGE ONLY
+   ========================= */
+
+.profile-page {
+    min-height: 100vh;
+    background: #f4f7fb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-card {
+    background: #ffffff;
+    width: 380px;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.profile-card h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #333;
+}
+
+.profile-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 15px;
+}
+
+.profile-row span {
+    color: #777;
+}
+
+.profile-row strong {
+    color: #222;
+}
+
+.status-ok {
+    color: #2ecc71;
+    font-weight: bold;
+}
+
+.btn-back {
+    display: block;
+    margin-top: 25px;
+    text-align: center;
+    text-decoration: none;
+    background: #4f46e5;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    transition: background 0.3s ease;
+}
+
+.btn-back:hover {
+    background: #3730a3;
+}

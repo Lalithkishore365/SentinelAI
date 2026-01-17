@@ -1,0 +1,39 @@
+{% extends "admin/layout.html" %}
+{% block content %}
+
+<h2>🎥 Session Replay</h2>
+
+<form method="POST">
+    <label>Select Session</label>
+    <select name="session_id" onchange="this.form.submit()">
+        <option value="">-- Choose Session --</option>
+        {% for s in sessions %}
+            <option value="{{ s.session_id }}"
+                {% if s.session_id == selected_session %}selected{% endif %}>
+                {{ s.session_id }}
+            </option>
+        {% endfor %}
+    </select>
+</form>
+
+{% if logs %}
+<hr>
+
+<table>
+    <tr>
+        <th>Time</th>
+        <th>Method</th>
+        <th>Endpoint</th>
+    </tr>
+
+    {% for log in logs %}
+    <tr>
+        <td>{{ log.request_time }}</td>
+        <td>{{ log.method }}</td>
+        <td>{{ log.endpoint }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+{% endblock %}
