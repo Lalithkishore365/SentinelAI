@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sentinel AI - Testing Dashboard</title>
+    <title>SentinelAI - Login & Testing Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -16,6 +16,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            transition: all 0.3s ease;
         }
 
         .container {
@@ -203,6 +204,142 @@
             border-top: 1px solid #ddd;
         }
 
+        /* ===== LOGIN ACTIVITY CARD ===== */
+        .login-activity-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white !important;
+            grid-column: 1 / -1;
+            border: 2px solid #fff;
+        }
+
+        .login-activity-card h2 {
+            color: white !important;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .live-activity-feed {
+            max-height: 300px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .login-entry {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid #4caf50;
+            animation: slideInDown 0.4s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-entry.new {
+            border-left: 4px solid #FFD700;
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid #FFD700;
+        }
+
+        .login-entry-time {
+            font-size: 0.75em;
+            color: #999;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .login-entry-email {
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 4px;
+            font-size: 0.95em;
+        }
+
+        .login-entry-detail {
+            font-size: 0.85em;
+            color: #555;
+            margin: 2px 0;
+        }
+
+        .login-entry-icon {
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .no-login-activity {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-style: italic;
+        }
+
+        .live-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #FFD700;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .stats-box {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .stats-box-label {
+            font-size: 0.8em;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+
+        .stats-box-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .login-from-page-badge {
+            display: inline-block;
+            background: #FFD700;
+            color: #333;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.7em;
+            font-weight: 700;
+            margin-left: 8px;
+            text-transform: uppercase;
+        }
+
         @media (max-width: 768px) {
             .main-grid {
                 grid-template-columns: 1fr;
@@ -217,13 +354,32 @@
     <div class="container">
         <header>
             <h1>🛡️ Sentinel AI</h1>
-            <p>Backend Testing Dashboard - Phase 2: Authentication & Session Management</p>
+            <p>Integrated Login & Testing Dashboard - Real-time Activity Monitoring</p>
         </header>
 
         <div class="main-grid">
+            <!-- LIVE LOGIN ACTIVITY FROM LOGIN PAGE -->
+            <div class="card login-activity-card">
+                <h2><span class="live-indicator"></span>🔐 Live Login Activity (from Login Page)</h2>
+                
+                <div class="stats-box">
+                    <div class="stats-box-label">Total Logins Detected</div>
+                    <div class="stats-box-value" id="totalLoginCount">0</div>
+                </div>
+
+                <div class="stats-box">
+                    <div class="stats-box-label">Active Sessions</div>
+                    <div class="stats-box-value" id="activeSessionCount">0</div>
+                </div>
+
+                <div class="live-activity-feed" id="liveActivityFeed">
+                    <div class="no-login-activity">📭 No login activity yet. Log in from the forms below to see real-time updates!</div>
+                </div>
+            </div>
+
             <!-- Auth Section -->
             <div class="card">
-                <h2>🔐 Authentication</h2>
+                <h2>🔐 Authentication (Direct API)</h2>
 
                 <div class="form-group">
                     <label>Username:</label>
@@ -327,6 +483,415 @@
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <script>
+        const API_URL = 'http://127.0.0.1:8000';
+        let lastProcessedLoginId = null;
+
+        // ===== LIVE LOGIN MONITORING =====
+        function monitorLoginActivity() {
+            setInterval(() => {
+                const currentUser = localStorage.getItem('currentUser');
+                if (currentUser) {
+                    try {
+                        const user = JSON.parse(currentUser);
+                        const loginId = user.id || user.email + user.startTime;
+                        
+                        if (loginId !== lastProcessedLoginId) {
+                            lastProcessedLoginId = loginId;
+                            addLoginToFeed(user, true);
+                        }
+                    } catch (e) {
+                        console.log('Could not parse currentUser');
+                    }
+                }
+            }, 500);
+        }
+
+        function addLoginToFeed(user, fromLoginPage = false) {
+            const feed = document.getElementById('liveActivityFeed');
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: true 
+            });
+
+            const loginEntry = document.createElement('div');
+            loginEntry.className = 'login-entry new';
+            const badge = fromLoginPage ? '<span class="login-from-page-badge">From Login Page</span>' : '';
+            loginEntry.innerHTML = `
+                <div class="login-entry-email"><span class="login-entry-icon">✨</span>NEW LOGIN: ${user.email}${badge}</div>
+                <div class="login-entry-detail"><span class="login-entry-icon">🌐</span>Browser: ${user.browser}</div>
+                <div class="login-entry-detail"><span class="login-entry-icon">📍</span>IP Address: ${user.ip}</div>
+                <div class="login-entry-detail"><span class="login-entry-icon">💻</span>Device: ${user.device}</div>
+                <div class="login-entry-time">⏰ ${timeString}</div>
+            `;
+
+            const emptyState = feed.querySelector('.no-login-activity');
+            if (emptyState) {
+                emptyState.remove();
+            }
+
+            feed.insertBefore(loginEntry, feed.firstChild);
+
+            setTimeout(() => {
+                loginEntry.classList.remove('new');
+            }, 3000);
+
+            while (feed.children.length > 10) {
+                feed.removeChild(feed.lastChild);
+            }
+
+            updateLoginStats();
+        }
+
+        function updateLoginStats() {
+            try {
+                const sessions = JSON.parse(localStorage.getItem('sentinelSessions')) || [];
+                document.getElementById('totalLoginCount').textContent = sessions.length;
+                
+                const currentUser = localStorage.getItem('currentUser');
+                const activeSessions = currentUser ? 1 : 0;
+                document.getElementById('activeSessionCount').textContent = activeSessions;
+            } catch (e) {
+                console.log('Could not update stats');
+            }
+        }
+
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('accessToken');
+            const sessionId = localStorage.getItem('sessionId');
+            const username = localStorage.getItem('username');
+            const userId = localStorage.getItem('userId');
+            const expiresIn = localStorage.getItem('expiresIn');
+
+            if (token && username) {
+                showTokenInfo(username, userId, expiresIn);
+                document.getElementById('sessionIdInput').value = sessionId || '';
+                document.getElementById('trackSessionId').value = sessionId || '';
+            }
+
+            monitorLoginActivity();
+            updateLoginStats();
+        });
+
+        async function apiCall(endpoint, method = 'GET', body = null, useAuth = false) {
+            const options = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            };
+
+            const token = localStorage.getItem('accessToken');
+            if (useAuth && token) {
+                options.headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+
+            try {
+                const response = await fetch(`${API_URL}${endpoint}`, options);
+                const data = await response.json();
+                return { status: response.status, data, ok: response.ok };
+            } catch (error) {
+                return { status: 0, error: error.message, ok: false };
+            }
+        }
+
+        function displayResponse(elementId, response, isSuccess) {
+            const element = document.getElementById(elementId);
+            const json = JSON.stringify(response, null, 2);
+            element.textContent = json;
+            element.className = `response-box ${isSuccess ? 'success' : 'error'}`;
+        }
+
+        function showTokenInfo(username, userId, expiresIn) {
+            document.getElementById('tokenInfo').style.display = 'block';
+            document.getElementById('username').textContent = username;
+            document.getElementById('userId').textContent = userId;
+            document.getElementById('expiresIn').textContent = expiresIn;
+        }
+
+        function clearStorage() {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('sessionId');
+            localStorage.removeItem('username');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('expiresIn');
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('sentinelSessions');
+            lastProcessedLoginId = null;
+            document.getElementById('tokenInfo').style.display = 'none';
+            document.getElementById('sessionIdInput').value = '';
+            document.getElementById('trackSessionId').value = '';
+            updateLoginStats();
+            alert('✅ All data cleared!');
+        }
+
+        async function register() {
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+
+            if (!username || !email || !password) {
+                displayResponse('registerResponse', { error: 'All fields required' }, false);
+                return;
+            }
+
+            const response = await apiCall('/register', 'POST', { username, email, password });
+            displayResponse('registerResponse', response.data, response.ok);
+        }
+
+        async function login() {
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+
+            if (!username || !password) {
+                displayResponse('loginResponse', { error: 'Username and password required' }, false);
+                return;
+            }
+
+            const response = await apiCall('/login', 'POST', { username, password });
+
+            if (response.ok) {
+                localStorage.setItem('accessToken', response.data.access_token);
+                localStorage.setItem('refreshToken', response.data.refresh_token);
+                localStorage.setItem('sessionId', response.data.session_id || '');
+                localStorage.setItem('username', username);
+                localStorage.setItem('userId', response.data.user_id);
+                localStorage.setItem('expiresIn', response.data.expires_in);
+
+                document.getElementById('sessionIdInput').value = response.data.session_id || '';
+                document.getElementById('trackSessionId').value = response.data.session_id || '';
+
+                showTokenInfo(username, response.data.user_id, response.data.expires_in);
+            }
+
+            displayResponse('loginResponse', response.data, response.ok);
+        }
+
+        async function getCurrentUser() {
+            const response = await apiCall('/me', 'GET', null, true);
+            displayResponse('userResponse', response.data, response.ok);
+        }
+
+        async function getSessionInfo() {
+            const sessionId = document.getElementById('sessionIdInput').value;
+
+            if (!sessionId) {
+                displayResponse('sessionResponse', { error: 'Session ID required' }, false);
+                return;
+            }
+
+            const response = await apiCall(`/sessions/${sessionId}`, 'GET', null, true);
+            displayResponse('sessionResponse', response.data, response.ok);
+        }
+
+        async function trackActivity() {
+            const sessionId = document.getElementById('trackSessionId').value;
+
+            if (!sessionId) {
+                displayResponse('trackResponse', { error: 'Session ID required' }, false);
+                return;
+            }
+
+            const response = await apiCall(`/track?session_id=${sessionId}`, 'GET', null, true);
+            displayResponse('trackResponse', response.data, response.ok);
+        }
+
+        async function trackActivityMultiple(times = 5) {
+            const sessionId = document.getElementById('trackSessionId').value;
+
+            if (!sessionId) {
+                displayResponse('trackMultipleResponse', { error: 'Session ID required' }, false);
+                return;
+            }
+
+            const results = [];
+            for (let i = 1; i <= times; i++) {
+                const response = await apiCall(`/track?session_id=${sessionId}`, 'GET', null, true);
+                results.push({
+                    call: i,
+                    status: response.status,
+                    success_count: response.data?.features?.success_login_count || 0,
+                    unique_ips: response.data?.features?.unique_ip_count || 0
+                });
+            }
+
+            const summary = {
+                message: `Logged activity ${times} times`,
+                calls: results,
+                final_features: results[results.length - 1]
+            };
+
+            displayResponse('trackMultipleResponse', summary, true);
+        }
+
+        async function refreshAccessToken() {
+            const refreshToken = localStorage.getItem('refreshToken');
+
+            if (!refreshToken) {
+                displayResponse('refreshResponse', { error: 'No refresh token stored. Login first.' }, false);
+                return;
+            }
+
+            const response = await apiCall(`/refresh?refresh_token=${refreshToken}`, 'POST');
+
+            if (response.ok) {
+                localStorage.setItem('accessToken', response.data.access_token);
+                alert('✅ Token refreshed!');
+            }
+
+            displayResponse('refreshResponse', response.data, response.ok);
+        }
+
+        async function logout() {
+            const sessionId = localStorage.getItem('sessionId');
+
+            if (!sessionId) {
+                displayResponse('logoutResponse', { error: 'No session found' }, false);
+                return;
+            }
+
+            const response = await apiCall(`/logout?session_id=${sessionId}`, 'POST', null, true);
+
+            if (response.ok) {
+                clearStorage();
+                alert('✅ Logged out successfully!');
+            }
+
+            displayResponse('logoutResponse', response.data, response.ok);
+        }
+
+        async function healthCheck() {
+            const response = await apiCall('/health', 'GET');
+            displayResponse('healthResponse', response.data, response.ok);
+        }
+
+        async function runAllTests() {
+            const testResults = document.getElementById('testResults');
+            testResults.innerHTML = '<p style="color: #999;">Running tests...</p>';
+
+            const results = [];
+
+            let response = await apiCall('/health', 'GET');
+            results.push({
+                name: 'Health Check',
+                passed: response.ok,
+                status: response.status
+            });
+
+            const testUsername = `testuser_${Date.now()}`;
+            response = await apiCall('/register', 'POST', {
+                username: testUsername,
+                email: `test_${Date.now()}@example.com`,
+                password: 'password123'
+            });
+            results.push({
+                name: 'Register User',
+                passed: response.ok,
+                status: response.status
+            });
+
+            response = await apiCall('/login', 'POST', {
+                username: testUsername,
+                password: 'password123'
+            });
+            const loginPassed = response.ok;
+            results.push({
+                name: 'Login',
+                passed: loginPassed,
+                status: response.status
+            });
+
+            let sessionId = null;
+            let accessToken = null;
+
+            if (loginPassed) {
+                sessionId = response.data.session_id;
+                accessToken = response.data.access_token;
+            }
+
+            if (accessToken) {
+                const tempToken = localStorage.getItem('accessToken');
+                localStorage.setItem('accessToken', accessToken);
+                response = await apiCall('/me', 'GET', null, true);
+                results.push({
+                    name: 'Get Current User',
+                    passed: response.ok,
+                    status: response.status
+                });
+                if (tempToken) localStorage.setItem('accessToken', tempToken);
+            }
+
+            if (sessionId && accessToken) {
+                localStorage.setItem('accessToken', accessToken);
+                response = await apiCall(`/track?session_id=${sessionId}`, 'GET', null, true);
+                results.push({
+                    name: 'Track Activity',
+                    passed: response.ok,
+                    status: response.status
+                });
+            }
+
+            if (sessionId && accessToken) {
+                response = await apiCall(`/sessions/${sessionId}`, 'GET', null, true);
+                results.push({
+                    name: 'Get Session Info',
+                    passed: response.ok,
+                    status: response.status
+                });
+            }
+
+            if (sessionId && accessToken) {
+                response = await apiCall(`/logout?session_id=${sessionId}`, 'POST', null, true);
+                results.push({
+                    name: 'Logout',
+                    passed: response.ok,
+                    status: response.status
+                });
+            }
+
+            if (sessionId && accessToken) {
+                response = await apiCall(`/track?session_id=${sessionId}`, 'GET', null, true);
+                results.push({
+                    name: 'Track After Logout (should fail)',
+                    passed: !response.ok,
+                    status: response.status
+                });
+            }
+
+            let html = '';
+            let passedCount = 0;
+
+            results.forEach((result, index) => {
+                const passed = result.passed;
+                if (passed) passedCount++;
+
+                html += `
+                    <div class="test-item ${passed ? 'passed' : 'failed'}">
+                        <div>
+                            <strong>${index + 1}. ${result.name}</strong>
+                            <br/>
+                            <span style="font-size: 0.85em; color: #999;">Status: ${result.status}</span>
+                        </div>
+                        <span class="badge ${passed ? 'passed' : 'failed'}">
+                            ${passed ? '✅ PASS' : '❌ FAIL'}
+                        </span>
+                    </div>
+                `;
+            });
+
+            html += `<hr style="margin-top: 15px;"/>`;
+            html += `<p><strong>Result: ${passedCount}/${results.length} tests passed</strong></p>`;
+
+            testResults.innerHTML = html;
+        }
+    </script>
 </body>
 </html>

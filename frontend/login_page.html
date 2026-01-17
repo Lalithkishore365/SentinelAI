@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SentinelAI - Authentication & Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            display: flex;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        /* ===== LOGIN PAGE ===== */
+        .login-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%);
+            border-right: 1px solid rgba(51, 65, 85, 0.3);
+        }
+
+        .login-section.hidden {
+            display: none;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+            border-radius: 16px;
+            padding: 48px 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #38bdf8;
+            margin-bottom: 8px;
+        }
+
+        .logo p {
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #e2e8f0;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+            border-radius: 8px;
+            color: #f1f5f9;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #38bdf8;
+            background: rgba(15, 23, 42, 0.9);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #64748b;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 16px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(56, 189, 248, 0.3);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .demo-hint {
+            text-align: center;
+            color: #64748b;
+            font-size: 12px;
+            padding: 12px;
+            background: rgba(56, 189, 248, 0.05);
+            border-radius: 6px;
+        }
+
+        .error-message {
+            display: none;
+            color: #ff5555;
+            font-size: 13px;
+            padding: 10px 12px;
+            background: rgba(255, 85, 85, 0.1);
+            border-radius: 6px;
+            margin-bottom: 16px;
+            border-left: 3px solid #ff5555;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* ===== DASHBOARD ===== */
+        .dashboard-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #0f172a;
+            overflow: hidden;
+        }
+
+        .dashboard-section.hidden {
+            display: none;
+        }
+
+        .dashboard-header {
+            padding: 24px 32px;
+            background: rgba(30, 41, 59, 0.5);
+            border-bottom: 1px solid rgba(51, 65, 85, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-title {
+            color: #f1f5f9;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: rgba(255, 85, 85, 0.2);
+            border: 1px solid rgba(255, 85, 85, 0.5);
+            border-radius: 6px;
+            color: #ff5555;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 85, 85, 0.3);
+        }
+
+        .dashboard-content {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .dashboard-content.full {
+            grid-template-columns: 1fr;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(51, 65, 85, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .card h2 {
+            color: #38bdf8;
+            font-size: 18px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 3px solid #38bdf8;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            color: #f1f5f9;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .activity-feed {
+            flex: 1;
+            overflow-y: auto;
+            margin-top: 12px;
+        }
+
+        .activity-item {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 3px solid #38bdf8;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .activity-info {
+            flex: 1;
+        }
+
+        .activity-user {
+            color: #f1f5f9;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .activity-detail {
+            color: #64748b;
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+
+        .activity-time {
+            color: #475569;
+            font-size: 11px;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-success {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .status-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .user-info {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border-left: 3px solid #22c55e;
+        }
+
+        .user-info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.2);
+            font-size: 13px;
+        }
+
+        .user-info-row:last-child {
+            border-bottom: none;
+        }
+
+        .user-info-label {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .user-info-value {
+            color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .login-section {
+                border-right: none;
+                border-bottom: 1px solid rgba(51, 65, 85, 0.3);
+            }
+
+            .dashboard-content {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN PAGE -->
+    <div class="login-section" id="loginSection">
+        <div class="login-card">
+            <div class="logo">
+                <h1>🛡️ SentinelAI</h1>
+                <p>Security Dashboard</p>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        placeholder="sentinel_admin"
+                        required
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        placeholder="admin@sentinelai.com" 
+                        required
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        placeholder="Enter your password" 
+                        required
+                    />
+                </div>
+
+                <button type="submit" class="login-btn">Sign In</button>
+            </form>
+
+            <div class="demo-hint">
+                💡 Demo: Use any username/email/password to test. No validation needed for demo!
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="dashboard-section hidden" id="dashboardSection">
+        <div class="dashboard-header">
+            <div class="dashboard-title">🔒 Security Dashboard</div>
+            <button class="logout-btn" onclick="handleLogout()">Logout</button>
+        </div>
+
+        <div class="dashboard-content">
+            <!-- Current User Info -->
+            <div class="card">
+                <h2>👤 Current Session</h2>
+                <div class="user-info">
+                    <div class="user-info-row">
+                        <span class="user-info-label">Username</span>
+                        <span class="user-info-value" id="sessionUsername">-</span>
+                    </div>
+                    <div class="user-info-row">
+                        <span class="user-info-label">Email</span>
+                        <span class="user-info-value" id="sessionEmail">-</span>
+                    </div>
+                    <div class="user-info-row">
+                        <span class="user-info-label">Login Time</span>
+                        <span class="user-info-value" id="sessionTime">-</span>
+                    </div>
+                    <div class="user-info-row">
+                        <span class="user-info-label">Session Duration</span>
+                        <span class="user-info-value" id="sessionDuration">0s</span>
+                    </div>
+                    <div class="user-info-row">
+                        <span class="user-info-label">Browser</span>
+                        <span class="user-info-value" id="sessionBrowser">-</span>
+                    </div>
+                    <div class="user-info-row">
+                        <span class="user-info-label">IP Address</span>
+                        <span class="user-info-value" id="sessionIP">-</span>
+                    </div>
+                    <div class="user-info-row">
+                        <span class="user-info-label">Device</span>
+                        <span class="user-info-value" id="sessionDevice">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="card">
+                <h2>📊 Session Statistics</h2>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <div class="stat-label">Total Logins</div>
+                        <div class="stat-value" id="totalLogins">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Active Sessions</div>
+                        <div class="stat-value" id="activeSessions">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Successful Auth</div>
+                        <div class="stat-value" id="successfulAuth">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Failed Attempts</div>
+                        <div class="stat-value" id="failedAttempts">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Activity Feed -->
+            <div class="card" style="grid-column: 1 / -1;">
+                <h2>⚡ Live Authentication Activity</h2>
+                <div class="activity-feed scrollbar-hide" id="activityFeed">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <div>No login activity yet. Log in to see real-time updates!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Session Storage
+        const sessions = JSON.parse(localStorage.getItem('sentinelSessions')) || [];
+        const sessionStats = JSON.parse(localStorage.getItem('sentinelStats')) || {
+            totalLogins: 0,
+            successfulAuth: 0,
+            failedAttempts: 0
+        };
+
+        // Simulate IP and device detection
+        function getClientInfo() {
+            const userAgent = navigator.userAgent;
+            const browserInfo = /Chrome\/(\d+)/.test(userAgent) ? 'Chrome' : 
+                              /Safari\/(\d+)/.test(userAgent) ? 'Safari' : 
+                              /Firefox\/(\d+)/.test(userAgent) ? 'Firefox' : 'Unknown';
+            
+            const deviceInfo = /Mobile|Android|iPhone/.test(userAgent) ? 'Mobile' : 'Desktop';
+            
+            // Simulate IP (demo purposes)
+            const simIP = `192.168.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}`;
+            
+            return {
+                browser: browserInfo,
+                device: deviceInfo,
+                ip: simIP,
+                timestamp: new Date().toLocaleString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                })
+            };
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorEl = document.getElementById('errorMessage');
+
+            if (!username || !email || !password) {
+                errorEl.textContent = '❌ Please enter username, email and password';
+                errorEl.classList.add('show');
+                return;
+            }
+
+            // Demo validation (no real auth needed)
+            errorEl.classList.remove('show');
+
+            // Create session
+            const clientInfo = getClientInfo();
+            const session = {
+                id: 'session_' + Date.now(),
+                username: username,
+                email: email,
+                loginTime: new Date().toLocaleString(),
+                startTime: Date.now(),
+                browser: clientInfo.browser,
+                ip: clientInfo.ip,
+                device: clientInfo.device,
+                status: 'active'
+            };
+
+            sessions.unshift(session); // Add to front of activity feed
+            sessionStats.totalLogins++;
+            sessionStats.successfulAuth++;
+
+            // Save to storage
+            localStorage.setItem('sentinelSessions', JSON.stringify(sessions));
+            localStorage.setItem('sentinelStats', JSON.stringify(sessionStats));
+            localStorage.setItem('currentUser', JSON.stringify(session));
+
+            // Switch to dashboard
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('dashboardSection').classList.remove('hidden');
+
+            // Reset form
+            document.getElementById('loginForm').reset();
+
+            // Update dashboard
+            updateDashboard();
+            startSessionTimer();
+            startActivityUpdates();
+        }
+
+        function updateDashboard() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            
+            if (currentUser) {
+                document.getElementById('sessionUsername').textContent = currentUser.username || '-';
+                document.getElementById('sessionEmail').textContent = currentUser.email;
+                document.getElementById('sessionTime').textContent = currentUser.loginTime;
+                document.getElementById('sessionBrowser').textContent = currentUser.browser;
+                document.getElementById('sessionIP').textContent = currentUser.ip;
+                document.getElementById('sessionDevice').textContent = currentUser.device;
+            }
+
+            // Update stats
+            document.getElementById('totalLogins').textContent = sessionStats.totalLogins;
+            document.getElementById('activeSessions').textContent = '1'; // Current session
+            document.getElementById('successfulAuth').textContent = sessionStats.successfulAuth;
+            document.getElementById('failedAttempts').textContent = sessionStats.failedAttempts;
+
+            // Update activity feed
+            updateActivityFeed();
+        }
+
+        function updateActivityFeed() {
+            const feed = document.getElementById('activityFeed');
+            
+            if (sessions.length === 0) {
+                feed.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <div>No login activity yet. Log in to see real-time updates!</div>
+                    </div>
+                `;
+                return;
+            }
+
+            feed.innerHTML = sessions.map((session, index) => `
+                <div class="activity-item">
+                    <div class="activity-info">
+                        <div class="activity-user">✓ ${session.username || '(no-username)'} (${session.email})</div>
+                        <div class="activity-detail">🌐 ${session.browser} on ${session.device}</div>
+                        <div class="activity-detail">📍 IP: ${session.ip}</div>
+                        <div class="activity-time">⏰ ${session.loginTime}</div>
+                    </div>
+                    <span class="status-badge status-success">${session.status === 'logged_out' ? 'LOGGED OUT' : 'ACTIVE'}</span>
+                </div>
+            `).join('');
+        }
+
+        function startSessionTimer() {
+            setInterval(() => {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                if (currentUser) {
+                    const elapsed = Math.floor((Date.now() - currentUser.startTime) / 1000);
+                    const hours = Math.floor(elapsed / 3600);
+                    const minutes = Math.floor((elapsed % 3600) / 60);
+                    const seconds = elapsed % 60;
+
+                    let duration = '';
+                    if (hours > 0) duration = `${hours}h ${minutes}m ${seconds}s`;
+                    else if (minutes > 0) duration = `${minutes}m ${seconds}s`;
+                    else duration = `${seconds}s`;
+
+                    document.getElementById('sessionDuration').textContent = duration;
+                }
+            }, 1000);
+        }
+
+        function startActivityUpdates() {
+            // Refresh activity feed every 2 seconds to show new logins
+            setInterval(updateActivityFeed, 2000);
+        }
+
+        function handleLogout() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (currentUser) {
+                currentUser.status = 'logged_out';
+                // Keep in history but mark as logged out
+                const sessionsFromStorage = JSON.parse(localStorage.getItem('sentinelSessions')) || [];
+                if (sessionsFromStorage.length > 0) {
+                    sessionsFromStorage[0].status = 'logged_out';
+                    localStorage.setItem('sentinelSessions', JSON.stringify(sessionsFromStorage));
+                }
+            }
+
+            localStorage.removeItem('currentUser');
+            
+            // Switch back to login
+            document.getElementById('dashboardSection').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('loginForm').reset();
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('dashboardSection').classList.remove('hidden');
+                updateDashboard();
+                startSessionTimer();
+                startActivityUpdates();
+            }
+        });
+    </script>
+</body>
+</html>
